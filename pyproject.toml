@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sixth"
+version = "0.1.0"
+description = "The sixth part of the quant loop: a persistent hypothesis graph that carries negative results forward."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "willfuse" }]
+keywords = ["quant", "backtest", "hypothesis-graph", "deflated-sharpe", "agents", "research"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+sixth = "sixth.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
