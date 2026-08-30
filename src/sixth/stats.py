@@ -65,11 +65,23 @@ def mean(xs: Sequence[float]) -> float:
 
 
 def stdev(xs: Sequence[float], ddof: int = 1) -> float:
+    """Sample standard deviation, with a guard for numerically-zero variance.
+
+    A constant series does not always sum to exactly zero variance: the mean
+    carries rounding error, so the squared deviations land at ~1e-36 instead of
+    0 on some platforms. Left alone that turns a flat return stream into a
+    Sharpe of 1e16. Anything below floating-point noise for the data's own scale
+    is treated as the zero it is.
+    """
     n = len(xs)
     if n - ddof <= 0:
         return 0.0
     m = mean(xs)
-    return math.sqrt(sum((x - m) ** 2 for x in xs) / (n - ddof))
+    ss = sum((x - m) ** 2 for x in xs)
+    scale = max(abs(m), max((abs(x) for x in xs), default=0.0))
+    if ss <= (1e-12 * scale) ** 2 * n:
+        return 0.0
+    return math.sqrt(ss / (n - ddof))
 
 
 def skewness(xs: Sequence[float]) -> float:

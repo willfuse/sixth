@@ -154,7 +154,8 @@ chain will argue its way past it. `RiskGate.check()` returns a smaller number, o
 raises. It has no text interface, so there is no argument to make to it.
 
 ```python
-gate = RiskGate(RiskLimits(max_position=0.5, max_drawdown=0.10))
+gate = RiskGate(RiskLimits(max_position=0.5, max_drawdown=0.10),
+                equity=100_000)
 gate.check(Order("AAPL", 5.0))     # -> 0.25, clamped
 gate.mark(equity=85_000)           # -15% from peak
 gate.check(Order("AAPL", 0.1))     # -> KillSwitchTripped
@@ -236,7 +237,7 @@ generated, so the whole loop runs offline with no vendor account.
 ## Tests
 
 ```bash
-python -m pytest tests -q     # 150 tests, no dependencies beyond pytest
+python -m pytest tests -q     # 153 tests, no dependencies beyond pytest
 ```
 
 Including the ones that matter: that a strategy cannot trade the bar that

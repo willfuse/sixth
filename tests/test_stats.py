@@ -86,3 +86,24 @@ def test_summarize_handles_empty_and_flat():
     flat = stats.summarize([0.0] * 100)
     assert flat["sharpe"] == 0.0
     assert flat["max_drawdown"] == 0.0
+
+
+def test_constant_series_has_zero_variance_not_floating_point_noise():
+    """A flat return stream must give Sharpe 0, not 1e16.
+
+    The squared deviations of a constant list do not always sum to exactly
+    zero -- the mean carries rounding error -- and dividing by that residue
+    produces an astronomically large Sharpe. Caught on Linux/3.9, invisible on
+    macOS/3.13, so it is pinned here across several magnitudes.
+    """
+    for value in (0.001, 0.1, 1.0, 1e-6, -0.003, 12345.678):
+        series = [value] * 252
+        assert stats.stdev(series) == 0.0, f"non-zero variance for constant {value}"
+        assert stats.sharpe(series) == 0.0, f"non-zero Sharpe for constant {value}"
+
+
+def test_near_constant_series_still_has_variance():
+    """The guard must not swallow a real, if small, dispersion."""
+    series = [0.001] * 251 + [0.002]
+    assert stats.stdev(series) > 0.0
+    assert stats.sharpe(series) > 0.0

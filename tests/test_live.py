@@ -112,3 +112,20 @@ def test_base_adapter_refuses_to_pretend_it_can_trade():
         BrokerAdapter().positions()
     with pytest.raises(NotImplementedError):
         BrokerAdapter().equity()
+
+
+def test_the_documented_example_actually_trips():
+    """The README and the guide both print this snippet. It has to work.
+
+    An earlier version omitted `equity=`, so the gate defaulted to 1.0 and
+    marking 85,000 read as a gain rather than a 15% drawdown -- the example
+    never tripped.
+    """
+    gate = RiskGate(RiskLimits(max_position=0.5, max_drawdown=0.10,
+                               max_daily_loss=0.02, allow_shorts=False),
+                    equity=100_000)
+    assert gate.check(Order("AAPL", 5.0)) == 0.25
+    assert gate.check(Order("AAPL", -1.0)) == 0.0
+    gate.mark(equity=85_000)
+    with pytest.raises(KillSwitchTripped):
+        gate.check(Order("AAPL", 0.1))
