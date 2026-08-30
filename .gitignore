@@ -10,3 +10,6 @@ dist/
 *.sqlite
 *.sqlite-journal
 runs/
+
+# built artefacts land in docs/, not the repo root
+/sixth-how-to-use-it.pdf
